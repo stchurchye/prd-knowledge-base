@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD 知识库 - 测试报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #1a1a1a; margin-bottom: 30px; text-align: center; }
+        h2 { color: #333; margin: 20px 0 15px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-card h3 { font-size: 36px; margin-bottom: 5px; }
+        .stat-card p { font-size: 14px; opacity: 0.9; }
+        .pass { color: #22c55e; font-weight: bold; }
+        .fail { color: #ef4444; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f8f9fa; font-weight: 600; color: #666; }
+        tr:hover { background: #fafafa; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #059669; }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .badge-info { background: #dbeafe; color: #1d4ed8; }
+        .progress-bar { height: 24px; background: #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a0); transition: width 0.3s ease; }
+        .domain-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px; background: #f0f9ff; color: #1e40af; }
+        .rule-item { padding: 15px; border-bottom: 1px solid #f0f0f0; }
+        .rule-item:last-child { border-bottom: none; }
+        .rule-text { color: #333; line-height: 1.5; }
+        .rule-meta { color: #888; font-size: 12px; margin-top: 8px; }
+        .timestamp { color: #888; font-size: 12px; text-align: right; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 PRD 知识库 - 测试报告</h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>23</h3>
+                <p>测试用例</p>
+            </div>
+            <div class="stat-card">
+                <h3>23</h3>
+                <p>全部通过</p>
+            </div>
+            <div class="stat-card">
+                <h3>38</h3>
+                <p>业务规则</p>
+            </div>
+            <div class="stat-card">
+                <h3>3</h3>
+                <p>PRD 文档</p>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%;"></div>
+        </div>
+        <p style="text-align: center; color: #22c55e; font-weight: bold; margin: 10px 0;">✅ 测试通过率: 100%</p>
+
+        <!-- API 测试结果 -->
+        <div class="card">
+            <h2>📡 API 测试结果</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>模块</th>
+                        <th>测试用例</th>
+                        <th>通过</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>健康检查</td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>PRD 管理</td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>规则管理</td>
+                        <td>6</td>
+                        <td>6</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>分析功能</td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>搜索功能</td>
+                        <td>2</td>
+                        <td>2</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>审计健康</td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td><span class="badge badge-success">✅ 全部通过</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 前端测试 -->
+        <div class="card">
+            <h2>🖥️ 前端页面测试</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>页面</th>
+                        <th>路径</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>投喂中心</td>
+                        <td>/upload</td>
+                        <td><span class="badge badge-success">✅ HTTP 200</span></td>
+                    </tr>
+                    <tr>
+                        <td>规则浏览</td>
+                        <td>/rules</td>
+                        <td><span class="badge badge-success">✅ HTTP 200</span></td>
+                    </tr>
+                    <tr>
+                        <td>风险仪表盘</td>
+                        <td>/risks</td>
+                        <td><span class="badge badge-success">✅ HTTP 200</span></td>
+                    </tr>
+                    <tr>
+                        <td>数据健康</td>
+                        <td>/health</td>
+                        <td><span class="badge badge-success">✅ HTTP 200</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 规则统计 -->
+        <div class="card">
+            <h2>📊 规则统计</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>业务领域</th>
+                        <th>规则数</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="domain-tag">结账分账</span></td>
+                        <td>24</td>
+                        <td>63.2%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="domain-tag">专属积分</span></td>
+                        <td>8</td>
+                        <td>21.1%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="domain-tag">资金管理</span></td>
+                        <td>3</td>
+                        <td>7.9%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="domain-tag">其他</span></td>
+                        <td>3</td>
+                        <td>7.9%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 提取的规则示例 -->
+        <div class="card">
+            <h2>📋 提取的业务规则示例</h2>
+
+            <div class="rule-item">
+                <div class="rule-text"><strong>[资金流转规则]</strong> 整单部分退款时，退款金额需按照原始分账比例反向分摊至各角色，计算误差调整至最后一个分账方以确保总和精确。</div>
+                <div class="rule-meta">涉及角色: 供应商、门店、总部 | 来源: 分账回退</div>
+            </div>
+
+            <div class="rule-item">
+                <div class="rule-text"><strong>[状态机流程]</strong> 分账回退退款成功时，系统自动生成新的分账订单写入结算明细，结算金额记为负值，且每个参与分账的角色生成单独的退款分账订单。</div>
+                <div class="rule-meta">涉及角色: 系统、分账接收方 | 来源: 分账回退</div>
+            </div>
+
+            <div class="rule-item">
+                <div class="rule-text"><strong>[数值参数阈值]</strong> 鎖定金额>=500 元后才可以提现； 单笔提现限额 5000 元； 单日提现限额 50000 元。</div>
+                <div class="rule-meta">涉及角色: 门店 | 来源: 限制门店提现金额</div>
+            </div>
+        </div>
+
+        <!-- 访问地址 -->
+        <div class="card">
+            <h2>🔗 访问地址</h2>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><strong>前端界面</strong></td>
+                        <td><a href="http://localhost:3000" target="_blank">http://localhost:3000</a></td>
+                    <td><span class="badge badge-info">浏览器访问</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>API 文档</strong></td>
+                        <td><a href="http://localhost:8000/docs" target="_blank">http://localhost:8000/docs</a></td>
+                        <td><span class="badge badge-info">Swagger UI</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>测试用例文档</strong></td>
+                        <td>prd-knowledge-base/TEST_CASES.md</td>
+                        <td><span class="badge badge-info">Markdown</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="timestamp">测试时间: 2026-04-14 | 测试工具: Claude Code</p>
+    </div>
+</body>
+</html>

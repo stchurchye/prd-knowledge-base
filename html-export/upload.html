@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD 知识库 - 投喂中心</title>
+<style>
+/* ── Apple Design System ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f5f5f7; --card: #fff; --sidebar: rgba(255,255,255,0.72);
+  --border: rgba(0,0,0,0.06); --accent: #0071e3; --accent-hover: #0077ed;
+  --muted: #86868b; --fg: #1d1d1f;
+  --success: #34c759; --success-text: #248a3d;
+  --warning: #ff9f0a; --warning-text: #c93400;
+  --danger: #ff3b30; --danger-text: #d70015;
+  --purple: #af52de; --purple-text: #8944ab;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--fg); display: flex; height: 100vh; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+/* Sidebar */
+.sidebar { width: 220px; background: var(--sidebar); backdrop-filter: blur(20px) saturate(180%); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 24px 20px 16px; }
+.sidebar-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.sidebar-header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sidebar nav { flex: 1; padding: 0 12px; }
+.sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--fg); text-decoration: none; transition: background 0.15s; }
+.sidebar nav a:hover { background: rgba(0,0,0,0.04); }
+.sidebar nav a.active { background: rgba(0,113,227,0.08); color: var(--accent); }
+.sidebar nav a svg { width: 18px; height: 18px; }
+.sidebar-footer { padding: 16px 20px; font-size: 11px; color: var(--muted); }
+
+/* Main */
+.main { flex: 1; overflow: auto; padding: 24px 32px; }
+.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.page-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* Card */
+.card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+
+/* Badge */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+.badge-draft { background: rgba(0,113,227,0.08); color: var(--accent); }
+.badge-active, .badge-parsed { background: rgba(52,199,89,0.1); color: var(--success-text); }
+.badge-challenged { background: rgba(255,59,48,0.1); color: var(--danger-text); }
+.badge-extracted { background: rgba(175,82,222,0.1); color: var(--purple-text); }
+.badge-uploaded { background: rgba(255,159,10,0.1); color: var(--warning-text); }
+
+/* Button */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-hover); }
+.btn-success { background: rgba(52,199,89,0.12); color: var(--success-text); }
+.btn-danger { background: rgba(255,59,48,0.08); color: var(--danger-text); } .btn-danger:hover { background: rgba(255,59,48,0.15); }
+.btn-secondary { background: rgba(0,0,0,0.04); color: var(--fg); } .btn-secondary:hover { background: rgba(0,0,0,0.08); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Input */
+.input { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); font-size: 13px; background: var(--card); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,0.12); }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { text-align: left; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 1px solid var(--border); }
+th, td { padding: 12px 16px; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:hover { background: rgba(0,0,0,0.015); }
+.text-muted { color: var(--muted); } .text-mono { font-family: "SF Mono", Menlo, monospace; } .text-right { text-align: right; }
+.text-12 { font-size: 12px; } .text-11 { font-size: 11px; }
+
+/* Upload zone */
+.upload-zone { border: 2px dashed rgba(0,0,0,0.12); border-radius: 12px; padding: 40px; text-align: center; transition: all 0.2s; background: var(--card); }
+.upload-zone:hover { border-color: var(--accent); background: rgba(0,113,227,0.02); }
+.upload-zone svg { width: 40px; height: 40px; color: var(--muted); margin: 0 auto 12px; }
+
+/* Alert */
+.alert { padding: 12px 16px; border-radius: 12px; font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+.alert-success { background: rgba(52,199,89,0.06); color: var(--success-text); }
+.alert-error { background: rgba(255,59,48,0.06); color: var(--danger-text); }
+
+/* Utility */
+.mb-6 { margin-bottom: 24px; } .mb-5 { margin-bottom: 20px; } .mb-4 { margin-bottom: 16px; }
+.mt-4 { margin-top: 16px; }
+.flex { display: flex; } .items-center { align-items: center; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; }
+.space-x-2 > * + * { margin-left: 8px; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>PRD 知识库</h1>
+    <p>业务规则管理平台</p>
+  </div>
+  <nav>
+    <a href="upload.html" class="active">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-4 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <span>投喂中心</span>
+    </a>
+    <a href="rules.html">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
+      <span>规则浏览</span>
+    </a>
+    <a href="risks.html">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19H19a2 2 0 001.75-2.96l-6.93-12a2 2 0 00-3.5 0l-6.93 12A2 2 0 005.07 19z"/></svg>
+      <span>风险仪表盘</span>
+    </a>
+    <a href="health.html">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span>数据健康</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">v1.0</div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+  <div class="mb-6">
+    <h2 class="page-title">投喂中心</h2>
+    <p class="page-desc">上传 PRD 文档，系统自动解析提取业务规则</p>
+  </div>
+
+  <div class="alert alert-success">成功上传 2 个文件</div>
+
+  <!-- Upload Zone -->
+  <div class="upload-zone mb-6">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+    <p style="font-size:14px;font-weight:500;margin-bottom:4px;">拖拽 .docx 文件到此处</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">或者点击选择文件上传</p>
+    <button class="btn btn-primary">选择文件</button>
+  </div>
+
+  <!-- PRD Table -->
+  <div class="card" style="overflow:hidden;">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>标题</th>
+          <th>领域</th>
+          <th>状态</th>
+          <th class="text-right">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-mono text-12 text-muted">3</td>
+          <td style="font-weight:500;">【专属积分】</td>
+          <td class="text-muted">营销资金</td>
+          <td><span class="badge badge-extracted">extracted</span></td>
+          <td class="text-right"><span class="text-12 text-muted">已完成</span> <button class="btn btn-danger" style="font-size:12px;padding:4px 12px;">删除</button></td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">2</td>
+          <td style="font-weight:500;">【分账回退&限制门店提现金额】PRD</td>
+          <td class="text-muted">结账分账</td>
+          <td><span class="badge badge-extracted">extracted</span></td>
+          <td class="text-right"><span class="text-12 text-muted">已完成</span> <button class="btn btn-danger" style="font-size:12px;padding:4px 12px;">删除</button></td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">4</td>
+          <td style="font-weight:500;">【红包营销活动】PRD</td>
+          <td class="text-muted">营销资金</td>
+          <td><span class="badge badge-parsed">parsed</span></td>
+          <td class="text-right"><button class="btn btn-success" style="font-size:12px;padding:4px 12px;">提取规则</button> <button class="btn btn-danger" style="font-size:12px;padding:4px 12px;">删除</button></td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">5</td>
+          <td style="font-weight:500;">【易宝支付接入】PRD</td>
+          <td class="text-muted">-</td>
+          <td><span class="badge badge-uploaded">uploaded</span></td>
+          <td class="text-right"><button class="btn btn-primary" style="font-size:12px;padding:4px 12px;">解析</button> <button class="btn btn-danger" style="font-size:12px;padding:4px 12px;">删除</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+</body>
+</html>

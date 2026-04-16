@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD 知识库 - 规则浏览</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #f5f5f7; --card: #fff; --sidebar: rgba(255,255,255,0.72); --border: rgba(0,0,0,0.06); --accent: #0071e3; --accent-hover: #0077ed; --muted: #86868b; --fg: #1d1d1f; --success-text: #248a3d; --danger-text: #d70015; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--fg); display: flex; height: 100vh; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+.sidebar { width: 220px; background: var(--sidebar); backdrop-filter: blur(20px) saturate(180%); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 24px 20px 16px; } .sidebar-header h1 { font-size: 15px; font-weight: 600; } .sidebar-header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sidebar nav { flex: 1; padding: 0 12px; } .sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--fg); text-decoration: none; transition: background 0.15s; } .sidebar nav a:hover { background: rgba(0,0,0,0.04); } .sidebar nav a.active { background: rgba(0,113,227,0.08); color: var(--accent); } .sidebar nav a svg { width: 18px; height: 18px; }
+.sidebar-footer { padding: 16px 20px; font-size: 11px; color: var(--muted); }
+.main { flex: 1; overflow: auto; padding: 24px 32px; }
+.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; } .page-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+.badge-draft { background: rgba(0,113,227,0.08); color: var(--accent); } .badge-active { background: rgba(52,199,89,0.1); color: var(--success-text); } .badge-challenged { background: rgba(255,59,48,0.1); color: var(--danger-text); }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: rgba(0,0,0,0.04); color: var(--fg); } .btn-secondary:hover { background: rgba(0,0,0,0.08); }
+.input { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); font-size: 13px; background: var(--card); outline: none; } .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,0.12); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { text-align: left; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 1px solid var(--border); }
+th, td { padding: 12px 16px; } tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; } tbody tr:hover { background: rgba(0,0,0,0.015); }
+.text-muted { color: var(--muted); } .text-mono { font-family: "SF Mono", Menlo, monospace; } .text-right { text-align: right; } .text-12 { font-size: 12px; }
+.stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { padding: 16px; } .stat-card .num { font-size: 24px; font-weight: 600; } .stat-card .label { font-size: 11px; font-weight: 500; color: var(--muted); }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-bar .input { flex: 1; min-width: 200px; }
+a.rule-link { color: var(--accent); text-decoration: none; } a.rule-link:hover { text-decoration: underline; text-underline-offset: 2px; }
+.source-doc { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.pager { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; } .pager-info { font-size: 12px; color: var(--muted); } .pager-btns { display: flex; gap: 4px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header"><h1>PRD 知识库</h1><p>业务规则管理平台</p></div>
+  <nav>
+    <a href="upload.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-4 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span>投喂中心</span></a>
+    <a href="rules.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg><span>规则浏览</span></a>
+    <a href="risks.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19H19a2 2 0 001.75-2.96l-6.93-12a2 2 0 00-3.5 0l-6.93 12A2 2 0 005.07 19z"/></svg><span>风险仪表盘</span></a>
+    <a href="health.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span>数据健康</span></a>
+  </nav>
+  <div class="sidebar-footer">v1.0</div>
+</aside>
+
+<main class="main">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div>
+      <h2 class="page-title">规则浏览器</h2>
+      <p class="page-desc">共 108 条规则</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="card stat-card"><div class="num">108</div><div class="label">总规则</div></div>
+    <div class="card stat-card"><div class="num">96</div><div class="label">draft</div></div>
+    <div class="card stat-card"><div class="num">8</div><div class="label">active</div></div>
+    <div class="card stat-card"><div class="num">3</div><div class="label">challenged</div></div>
+    <div class="card stat-card"><div class="num">1</div><div class="label">deprecated</div></div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    <input class="input" placeholder="搜索规则内容..." style="flex:1;min-width:200px;">
+    <select class="input">
+      <option>全部状态</option><option>draft</option><option>active</option><option>challenged</option><option>deprecated</option>
+    </select>
+    <button class="btn btn-primary">筛选</button>
+  </div>
+
+  <!-- Table -->
+  <div class="card" style="overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>规则内容</th><th>来源文档</th><th>领域</th><th>分类</th><th>状态</th><th>提取时间</th><th class="text-right">调用</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-mono text-12 text-muted">100</td>
+          <td style="max-width:320px;"><a class="rule-link" href="rule-detail.html">专属积分订单发生售后退款时，仅支持整单退款，不支持部分退款；退款成功后需返还用户全部...</a></td>
+          <td><div class="source-doc">【专属积分】</div></td>
+          <td class="text-muted">售后维权</td>
+          <td class="text-muted">状态机流程</td>
+          <td><span class="badge badge-draft">draft</span></td>
+          <td class="text-12 text-muted">04/14 16:22</td>
+          <td class="text-right text-mono text-12 text-muted">0</td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">99</td>
+          <td style="max-width:320px;"><a class="rule-link" href="rule-detail.html">门店发起提现时，单笔提现金额不得超过可提现余额的100%，且需满足最低提现金额限制...</a></td>
+          <td><div class="source-doc">【分账回退&限制门店提现金额】PRD</div></td>
+          <td class="text-muted">结账分账</td>
+          <td class="text-muted">数值参数阈值</td>
+          <td><span class="badge badge-active">active</span></td>
+          <td class="text-12 text-muted">04/14 14:08</td>
+          <td class="text-right text-mono text-12 text-muted">12</td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">98</td>
+          <td style="max-width:320px;"><a class="rule-link" href="rule-detail.html">分账回退操作需要总部管理员审批，审批通过后资金原路退回至分账发起方账户...</a></td>
+          <td>
+            <div class="source-doc">【分账回退&限制门店提现金额】PRD</div>
+            <div class="source-doc">【专属积分】</div>
+          </td>
+          <td class="text-muted">结账分账</td>
+          <td class="text-muted">资金流转规则</td>
+          <td><span class="badge badge-challenged">challenged</span></td>
+          <td class="text-12 text-muted">04/14 14:08</td>
+          <td class="text-right text-mono text-12 text-muted">5</td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">97</td>
+          <td style="max-width:320px;"><a class="rule-link" href="rule-detail.html">红包活动创建后，活动状态流转为：草稿→审核中→已发布→进行中→已结束，任一环节可终止...</a></td>
+          <td><div class="source-doc">【红包营销活动】PRD</div></td>
+          <td class="text-muted">营销资金</td>
+          <td class="text-muted">状态机流程</td>
+          <td><span class="badge badge-draft">draft</span></td>
+          <td class="text-12 text-muted">04/14 13:55</td>
+          <td class="text-right text-mono text-12 text-muted">0</td>
+        </tr>
+        <tr>
+          <td class="text-mono text-12 text-muted">96</td>
+          <td style="max-width:320px;"><a class="rule-link" href="rule-detail.html">单个红包金额范围为0.01元至200元，单次活动总预算上限为100万元...</a></td>
+          <td><div class="source-doc">【红包营销活动】PRD</div></td>
+          <td class="text-muted">营销资金</td>
+          <td class="text-muted">数值参数阈值</td>
+          <td><span class="badge badge-active">active</span></td>
+          <td class="text-12 text-muted">04/14 13:55</td>
+          <td class="text-right text-mono text-12 text-muted">23</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pager -->
+  <div class="pager">
+    <div class="pager-info">第 1/6 页，共 108 条</div>
+    <div class="pager-btns">
+      <button class="btn btn-secondary" disabled>上一页</button>
+      <button class="btn btn-secondary">下一页</button>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

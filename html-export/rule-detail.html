@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD 知识库 - 规则详情</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #f5f5f7; --card: #fff; --sidebar: rgba(255,255,255,0.72); --border: rgba(0,0,0,0.06); --accent: #0071e3; --muted: #86868b; --fg: #1d1d1f; --success-text: #248a3d; --danger-text: #d70015; --warning-text: #c93400; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--fg); display: flex; height: 100vh; -webkit-font-smoothing: antialiased; }
+.sidebar { width: 220px; background: var(--sidebar); backdrop-filter: blur(20px) saturate(180%); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 24px 20px 16px; } .sidebar-header h1 { font-size: 15px; font-weight: 600; } .sidebar-header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sidebar nav { flex: 1; padding: 0 12px; } .sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--fg); text-decoration: none; } .sidebar nav a:hover { background: rgba(0,0,0,0.04); } .sidebar nav a.active { background: rgba(0,113,227,0.08); color: var(--accent); } .sidebar nav a svg { width: 18px; height: 18px; }
+.sidebar-footer { padding: 16px 20px; font-size: 11px; color: var(--muted); }
+.main { flex: 1; overflow: auto; padding: 24px 32px; max-width: 780px; }
+.card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+.badge-draft { background: rgba(0,113,227,0.08); color: var(--accent); }
+.badge-doc { background: rgba(0,113,227,0.06); color: var(--accent); }
+.badge-open { background: rgba(255,159,10,0.1); color: var(--warning-text); }
+.badge-resolved { background: rgba(52,199,89,0.1); color: var(--success-text); }
+.btn { display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; }
+.btn-warning { background: rgba(255,159,10,0.12); color: var(--warning-text); }
+.input { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); font-size: 13px; background: var(--card); outline: none; width: 100%; } .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,0.12); }
+textarea.input { resize: none; }
+.back-link { font-size: 13px; color: var(--accent); text-decoration: none; display: inline-block; margin-bottom: 16px; } .back-link:hover { text-decoration: underline; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; padding-top: 12px; border-top: 1px solid var(--border); }
+.meta-grid .label { color: var(--muted); }
+.divider { border-top: 1px solid var(--border); padding-top: 12px; }
+.section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 8px; }
+.log-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.log-row:last-child { border-bottom: none; }
+pre.params { font-size: 12px; padding: 12px; border-radius: 8px; background: var(--bg); font-family: "SF Mono", Menlo, monospace; overflow: auto; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header"><h1>PRD 知识库</h1><p>业务规则管理平台</p></div>
+  <nav>
+    <a href="upload.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-4 4h8a2 2 0 002-2V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span>投喂中心</span></a>
+    <a href="rules.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg><span>规则浏览</span></a>
+    <a href="risks.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19H19a2 2 0 001.75-2.96l-6.93-12a2 2 0 00-3.5 0l-6.93 12A2 2 0 005.07 19z"/></svg><span>风险仪表盘</span></a>
+    <a href="health.html"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span>数据健康</span></a>
+  </nav>
+  <div class="sidebar-footer">v1.0</div>
+</aside>
+
+<main class="main">
+  <a href="rules.html" class="back-link">← 返回规则列表</a>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+    <h2 style="font-size:22px;font-weight:600;">规则 #100</h2>
+    <span class="badge badge-draft">draft</span>
+  </div>
+
+  <div class="card" style="padding:20px;">
+    <p style="font-size:14px;line-height:1.7;margin-bottom:16px;">专属积分订单发生售后退款时，仅支持整单退款，不支持部分退款；退款成功后需返还用户全部已消耗的专属积分。</p>
+
+    <div class="meta-grid">
+      <div><span class="label">领域：</span>售后维权</div>
+      <div><span class="label">分类：</span>状态机流程</div>
+      <div><span class="label">来源章节：</span>专属积分售后（总部及门店售后）</div>
+      <div><span class="label">风险评分：</span>0</div>
+    </div>
+
+    <!-- Source Docs -->
+    <div class="divider" style="margin-top:16px;">
+      <div class="section-label">来源文档</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span class="badge badge-doc">【专属积分】</span>
+        <span class="badge badge-doc">【分账回退&限制门店提现金额】PRD</span>
+      </div>
+    </div>
+
+    <div class="meta-grid" style="margin-top:16px;">
+      <div><span class="label">调用次数：</span>0</div>
+      <div><span class="label">最后调用：</span>-</div>
+      <div><span class="label">提取时间：</span>2026/4/14 16:22</div>
+      <div><span class="label">更新时间：</span>2026/4/14 16:22</div>
+    </div>
+
+    <!-- Params -->
+    <div class="divider" style="margin-top:16px;">
+      <div class="section-label">关键参数</div>
+      <pre class="params">{
+  "退款模式": "整单退款",
+  "积分返还": "全部返还"
+}</pre>
+    </div>
+  </div>
+
+  <!-- Challenge Form -->
+  <div style="margin-top:32px;">
+    <h3 class="section-title">提交质疑</h3>
+    <div class="card" style="padding:16px;">
+      <input class="input" placeholder="你的名字" style="margin-bottom:12px;">
+      <textarea class="input" placeholder="质疑内容..." rows="3" style="margin-bottom:12px;"></textarea>
+      <button class="btn btn-warning">提交质疑</button>
+    </div>
+  </div>
+
+  <!-- Challenges -->
+  <div style="margin-top:32px;">
+    <h3 class="section-title">质疑记录</h3>
+    <div class="card" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:500;font-size:13px;">张三</span>
+        <span class="badge badge-open">open</span>
+      </div>
+      <p style="margin-top:8px;font-size:13px;">这条规则是否适用于虚拟商品？虚拟商品的积分返还逻辑可能不同。</p>
+    </div>
+    <div class="card" style="padding:16px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:500;font-size:13px;">李四</span>
+        <span class="badge badge-resolved">resolved</span>
+      </div>
+      <p style="margin-top:8px;font-size:13px;">退款后积分返还的时效性需要明确，建议补充T+1还是实时返还。</p>
+      <p style="margin-top:4px;font-size:13px;color:var(--muted);">处理结果：已确认为实时返还，规则已更新。</p>
+    </div>
+  </div>
+
+  <!-- Logs -->
+  <div style="margin-top:32px;">
+    <h3 class="section-title">操作日志</h3>
+    <div class="card" style="overflow:hidden;">
+      <div class="log-row"><span><span style="color:var(--muted)">系统</span> extract</span><span style="font-size:11px;color:var(--muted)">2026/4/14 16:22</span></div>
+      <div class="log-row"><span><span style="color:var(--muted)">张三</span> challenge</span><span style="font-size:11px;color:var(--muted)">2026/4/14 17:05</span></div>
+      <div class="log-row"><span><span style="color:var(--muted)">李四</span> resolve_challenge</span><span style="font-size:11px;color:var(--muted)">2026/4/14 18:30</span></div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
