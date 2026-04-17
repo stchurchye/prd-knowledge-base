@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     qwen_api_key: str = ""
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_model: str = "qwen-max"  # 可选: qwen-plus, qwen-turbo
+    claude_model: str = "qwen-max"
 
     # Anthropic (可选，已弃用)
     anthropic_api_key: str = ""
@@ -16,8 +17,8 @@ class Settings(BaseSettings):
     voyage_api_key: str = ""
     upload_dir: str = "./uploads"
     cors_origins: list[str] = ["http://localhost:3000"]
-    cors_allow_methods: list[str] = ["GET", "POST", "PUT", "DELETE"]
-    cors_allow_headers: list[str] = ["Content-Type", "Authorization"]
+    cors_allow_methods: list[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]                                    
+    cors_allow_headers: list[str] = ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"]
 
     # Feishu / Lark
     feishu_app_id: str = ""
@@ -25,6 +26,13 @@ class Settings(BaseSettings):
 
     # Qwen-VL (通义千问视觉 - 图片识别)
     qwen_vl_model: str = "qwen-vl-max"
+    postgres_password: str = ""
+
+    # 企业微信机器人
+    wechat_work_corp_id: str = ""
+    wechat_work_agent_id: str = ""
+    wechat_work_secret: str = ""
+    wechat_work_token: str = ""  # webhook 验证 token
 
     class Config:
         env_file = ".env"

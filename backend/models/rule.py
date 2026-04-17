@@ -11,7 +11,8 @@ class Rule(Base):
     __tablename__ = "rules"
 
     id = Column(Integer, primary_key=True)
-    prd_id = Column(Integer, ForeignKey("prds.id", ondelete="SET NULL"), nullable=True)  # 保留：首次提取来源
+    prd_id = Column(Integer, ForeignKey("prds.id", ondelete="SET NULL"), nullable=True)  # 兼容旧数据
+    material_id = Column(Integer, ForeignKey("materials.id", ondelete="SET NULL"), nullable=True)  # 新关联
     domain = Column(String(50))
     category = Column(String(100))
     rule_text = Column(Text, nullable=False)
@@ -30,6 +31,7 @@ class Rule(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     prd = relationship("PRD", back_populates="rules")
+    material = relationship("Material", back_populates="rules")
     source_prds = relationship("PRD", secondary=rule_sources, backref="sourced_rules")
     challenges = relationship("Challenge", back_populates="rule", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="rule", cascade="all, delete-orphan")
