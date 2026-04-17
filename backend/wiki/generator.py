@@ -29,13 +29,21 @@ class WikiGenerator:
         # 2. 生成概念页面（按 category 分组）
         concept_pages = self._generate_concept_pages(material, rules, db)
 
-        # 3. 更新 index.md
+        # 3. LLM 驱动的知识综合
+        synthesis_page = await self._generate_llm_synthesis(material, rules, db)
+
+        # 4. 检测与已有规则的矛盾
+        contradiction_page = await self._detect_contradictions(material, rules, db)
+
+        # 5. 更新 index.md
         self._update_index(material, summary_page, concept_pages)
 
-        # 4. 追加 log.md
+        # 6. 追加 log.md
         self._append_log(material, "generate_wiki", {
-            "pages_created": len(concept_pages) + 1,
-            "rules_covered": len(rules)
+            "pages_created": len(concept_pages) + 1 + (1 if synthesis_page else 0),
+            "rules_covered": len(rules),
+            "has_synthesis": synthesis_page is not None,
+            "contradictions_found": contradiction_page is not None
         })
 
         # 5. 记录 WikiLog
@@ -269,6 +277,148 @@ class WikiGenerator:
                 existing.is_dirty = True
                 existing.version += 1
                 db.commit()
+
+
+    async def _generate_llm_synthesis(self, material: Material, rules: list[Rule], db: Session) -> Optional[WikiPage]:
+        """LLM 驱动的知识综合 - 生成深度分析页面"""
+        if not rules or len(rules) < 2:
+            return None
+
+        try:
+            from extractors.llm_client import get_llm_client, get_model_name
+            client = get_llm_client()
+            model = get_model_name()
+        except Exception:
+            logger.warning("LLM 客户端不可用，跳过知识综合")
+            return None
+
+        rules_text = "\n".join(f"- [{r.category or '未分类'}] {r.rule_text}" for r in rules[:50])
+
+        prompt = (
+            f"你是知识库维护专家。以下是从材料「{material.title}」中提取的 {len(rules)} 条业务规则。\n\n"
+            f"请生成一份知识综合报告，包含：\n"
+            f"1. 核心发现：这些规则反映了什么业务逻辑和设计思路\n"
+            f"2. 关键实体：涉及哪些角色、系统、流程\n"
+            f"3. 规则间关系：哪些规则互相依赖、互相约束\n"
+            f"4. 潜在风险：哪些规则可能存在歧义或遗漏\n"
+            f"5. 建议：需要进一步确认或补充的内容\n\n"
+            f"=== 规则列表 ===\n{rules_text}\n\n"
+            f"请用 Markdown 格式输出。"
+        )
+
+        try:
+            response = client.chat.completions.create(
+                model=model, max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            content = response.choices[0].message.content
+
+            page_path = f"{WIKI_DIR}/{material.id}_synthesis.md"
+            with open(page_path, "w", encoding="utf-8") as f:
+                f.write(content)
+
+            page = WikiPage(
+                material_id=material.id,
+                title=f"{material.title} - 知识综合",
+                page_type="synthesis",
+                page_path=page_path,
+                markdown_content=content,
+                related_rules=[r.id for r in rules],
+                last_generated_at=datetime.now()
+            )
+            db.add(page)
+            db.commit()
+            db.refresh(page)
+            return page
+
+        except Exception as e:
+            logger.warning("知识综合生成失败: %s", e)
+            return None
+
+    async def _detect_contradictions(self, material: Material, rules: list[Rule], db: Session) -> Optional[WikiPage]:
+        """检测新规则与已有规则的矛盾"""
+        import numpy as np
+
+        new_rules_with_emb = [r for r in rules if r.embedding is not None]
+        if not new_rules_with_emb:
+            return None
+
+        existing_rules = db.query(Rule).filter(
+            Rule.material_id != material.id,
+            Rule.status != "deprecated",
+            Rule.embedding.isnot(None)
+        ).all()
+
+        if not existing_rules:
+            return None
+
+        contradictions = []
+        ex_embs = np.array([r.embedding for r in existing_rules])
+        ex_norms = np.linalg.norm(ex_embs, axis=1, keepdims=True)
+        ex_norms[ex_norms == 0] = 1
+        ex_normalized = ex_embs / ex_norms
+
+        opposites = [
+            ("允许", "禁止"), ("可以", "不可以"), ("支持", "不支持"),
+            ("必须", "不得"), ("需要", "不需要"), ("开启", "关闭"),
+        ]
+
+        for new_rule in new_rules_with_emb:
+            new_emb = np.array(new_rule.embedding)
+            new_norm = np.linalg.norm(new_emb)
+            if new_norm == 0:
+                continue
+            sims = ex_normalized @ (new_emb / new_norm)
+
+            for idx in np.where(sims > 0.8)[0]:
+                existing = existing_rules[idx]
+                t1 = (new_rule.rule_text or "").lower()
+                t2 = (existing.rule_text or "").lower()
+
+                for pos, neg in opposites:
+                    if (pos in t1 and neg in t2) or (neg in t1 and pos in t2):
+                        contradictions.append({
+                            "new_rule_id": new_rule.id,
+                            "new_rule_text": new_rule.rule_text[:100],
+                            "existing_rule_id": existing.id,
+                            "existing_rule_text": existing.rule_text[:100],
+                            "similarity": float(sims[idx]),
+                            "conflict_type": f"{pos}/{neg}"
+                        })
+                        break
+
+        if not contradictions:
+            return None
+
+        lines = [
+            f"# 矛盾检测报告 - {material.title}",
+            f"\n> 检测时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            f"\n发现 **{len(contradictions)}** 处潜在矛盾：\n"
+        ]
+        for i, c in enumerate(contradictions, 1):
+            lines.append(f"\n## 矛盾 {i} (相似度: {c['similarity']:.2f})")
+            lines.append(f"\n**新规则** (ID: {c['new_rule_id']}): {c['new_rule_text']}")
+            lines.append(f"\n**已有规则** (ID: {c['existing_rule_id']}): {c['existing_rule_text']}")
+            lines.append(f"\n冲突类型: {c['conflict_type']}\n")
+
+        content = "\n".join(lines)
+        page_path = f"{WIKI_DIR}/{material.id}_contradictions.md"
+
+        with open(page_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        page = WikiPage(
+            material_id=material.id,
+            title=f"{material.title} - 矛盾检测",
+            page_type="contradiction_report",
+            page_path=page_path,
+            markdown_content=content,
+            last_generated_at=datetime.now()
+        )
+        db.add(page)
+        db.commit()
+        db.refresh(page)
+        return page
 
 
 # 全局实例

@@ -23,6 +23,7 @@ class Rule(Base):
     source_section = Column(String(200))
     risk_score = Column(Float, default=0)
     risk_flags = Column(ARRAY(Text))
+    confidence = Column(Float)  # 提取置信度 0-1
     status = Column(String(20), default="draft")
     hit_count = Column(Integer, default=0)
     last_hit_at = Column(DateTime)

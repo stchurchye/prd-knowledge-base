@@ -212,4 +212,34 @@ export const api = {
     return request<SearchResult[]>(`/api/search/?${new URLSearchParams(params).toString()}`);
   },
   embedAll: () => request<{ embedded: number; total_without_embedding: number }>("/api/search/embed-all", { method: "POST" }),
+
+  // Materials
+  listMaterials: (materialType?: string, docType?: string) => {
+    const params = new URLSearchParams();
+    if (materialType && materialType !== "all") params.set("material_type", materialType);
+    if (docType) params.set("doc_type", docType);
+    return request<any[]>(`/api/materials/?${params.toString()}`);
+  },
+  uploadImage: async (file: File, docType: string = "prd") => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`${API_BASE}/api/materials/upload-image?doc_type=${docType}`, { method: "POST", body: form });
+    if (!res.ok) throw new Error((await res.json()).detail);
+    return res.json();
+  },
+  processImage: (id: number) => request<any>(`/api/materials/${id}/process-image`, { method: "POST" }),
+  deleteMaterial: (id: number) => request<{ status: string }>(`/api/materials/${id}`, { method: "DELETE" }),
+
+  // Wiki
+  wikiIndex: () => fetch(`${API_BASE}/api/wiki/index`).then(r => r.text()),
+  wikiLog: () => fetch(`${API_BASE}/api/wiki/log`).then(r => r.text()),
+  wikiPages: () => request<any[]>("/api/wiki/pages"),
+  wikiPage: (path: string) => request<{ path: string; content: string }>(`/api/wiki/page?path=${encodeURIComponent(path)}`),
+  regenerateWiki: (materialId: number) => request<any>(`/api/wiki/regenerate/${materialId}`, { method: "POST" }),
+
+  // Wechat Work
+  wechatMessages: (status?: string) => {
+    const qs = status ? `?status=${status}` : "";
+    return request<any[]>(`/api/wechat-work/messages${qs}`);
+  },
 };

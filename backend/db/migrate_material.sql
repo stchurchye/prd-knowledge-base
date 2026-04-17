@@ -85,10 +85,15 @@ CREATE TABLE wechat_work_messages (
     processed_at TIMESTAMP
 );
 
--- 6. 添加 rules 表的 material_id 字段
+-- 6. 添加 rules 表的 material_id 和 confidence 字段
 ALTER TABLE rules ADD COLUMN material_id INTEGER REFERENCES materials(id) ON DELETE SET NULL;
+ALTER TABLE rules ADD COLUMN confidence FLOAT;
 
--- 7. 更新 rules 的 material_id（从 prds 映射）
+-- 7. 修改 rule_sources 表，prd_id 改为可空，添加 material_id
+ALTER TABLE rule_sources ALTER COLUMN prd_id DROP NOT NULL;
+ALTER TABLE rule_sources ADD COLUMN material_id INTEGER REFERENCES materials(id) ON DELETE CASCADE;
+
+-- 8. 更新 rules 的 material_id（从 prds 映射）
 UPDATE rules SET material_id = prd_id WHERE prd_id IS NOT NULL;
 
 -- 8. 创建索引

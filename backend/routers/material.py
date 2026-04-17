@@ -147,7 +147,7 @@ async def process_image(material_id: int, db: Session = Depends(get_db)):
             )
             db.add(rule)
             db.flush()
-            db.execute(sa_insert(rule_sources).values(rule_id=rule.id, prd_id=None))
+            db.execute(sa_insert(rule_sources).values(rule_id=rule.id, material_id=material.id))
             created.append(rule)
 
         # 向量化
