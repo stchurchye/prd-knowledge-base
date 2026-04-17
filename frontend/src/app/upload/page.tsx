@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
+import { ImageUploadSection } from "./ImageUploadSection";
 
 interface PRDItem {
   id: number;
@@ -113,8 +114,8 @@ export default function UploadPage() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-[22px] font-semibold tracking-tight">文档库</h2>
-        <p className="text-[13px] mt-0.5" style={{ color: "var(--muted)" }}>管理技术文档与 PRD，系统自动解析提取业务规则</p>
+        <h2 className="text-[22px] font-semibold tracking-tight">材料库</h2>
+        <p className="text-[13px] mt-0.5" style={{ color: "var(--muted)" }}>管理文档与图片，系统自动提取业务规则</p>
       </div>
 
       {msg.text && (
@@ -138,6 +139,9 @@ export default function UploadPage() {
           ))}
         </div>
       </div>
+
+      {/* 图片上传区域 */}
+      <ImageUploadSection docType={docType} onUploadComplete={refresh} />
 
       <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)}
         onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}

@@ -43,7 +43,7 @@ def parse_docx(filepath: str) -> dict:
                 continue
             raw_lines.append(text)
 
-            style = para.style.name or ""
+            style = (para.style.name if para.style else "") or ""
 
             if style == "Title":
                 title = text

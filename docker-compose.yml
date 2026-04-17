@@ -36,7 +36,7 @@ services:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: http://backend:8000
+        NEXT_PUBLIC_API_URL: http://1.14.181.173:8000
     container_name: prd-kb-frontend
     ports:
       - "3000:3000"
