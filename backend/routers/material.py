@@ -157,6 +157,11 @@ async def process_image(material_id: int, db: Session = Depends(get_db)):
             for rule, emb in zip(created, embeddings):
                 rule.embedding = emb
 
+        # 生成 Wiki
+        if created:
+            from wiki import wiki_generator
+            await wiki_generator.generate_for_material(material, created, db)
+
         elapsed = round(time.time() - start_time, 2)
         material.status = "extracted"
         material.rules_count = len(created)

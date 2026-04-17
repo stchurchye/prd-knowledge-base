@@ -152,6 +152,11 @@ async def _process_wechat_image(msg: WechatWorkMessage, image_url: str, sender_n
             for rule, emb in zip(created_rules, embeddings):
                 rule.embedding = emb
 
+        # 6. 生成 Wiki
+        if created_rules:
+            from wiki import wiki_generator
+            await wiki_generator.generate_for_material(material, created_rules, db)
+
         # 6. 更新状态
         elapsed = round(time.time() - start_time, 2)
         material.status = "extracted"
