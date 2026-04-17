@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
-from routers import prd, rules, analysis, health, search, material
+from routers import prd, rules, analysis, health, search, material, wechat_work
 
 os.makedirs(settings.upload_dir, exist_ok=True)
 
@@ -24,6 +24,7 @@ app.include_router(analysis.router)
 app.include_router(health.router)
 app.include_router(search.router)
 app.include_router(material.router)
+app.include_router(wechat_work.router)
 
 
 @app.get("/api/ping")
