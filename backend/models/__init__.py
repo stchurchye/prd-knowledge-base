@@ -9,9 +9,10 @@ from models.extraction_log import ExtractionLog
 from models.wiki_page import WikiPage
 from models.wiki_log import WikiLog
 from models.wechat_work_message import WechatWorkMessage
+from models.user import User
 
 __all__ = [
     "Material", "PRD", "Rule", "Challenge", "AuditLog",
     "ConflictRecord", "ExtractionLog", "WikiPage", "WikiLog",
-    "WechatWorkMessage", "rule_sources"
+    "WechatWorkMessage", "User", "rule_sources"
 ]

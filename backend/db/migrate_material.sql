@@ -105,3 +105,20 @@ CREATE INDEX idx_wiki_logs_created_at ON wiki_logs(created_at);
 CREATE INDEX idx_wechat_work_messages_msg_id ON wechat_work_messages(msg_id);
 CREATE INDEX idx_wechat_work_messages_status ON wechat_work_messages(status);
 CREATE INDEX idx_rules_material_id ON rules(material_id);
+
+-- 10. 创建 users 表
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(128) NOT NULL,
+    display_name VARCHAR(100),
+    role VARCHAR(20) DEFAULT 'user',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_login_at TIMESTAMP
+);
+
+-- 11. 创建默认管理员（密码: admin123）
+INSERT INTO users (username, password_hash, display_name, role) VALUES
+('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '管理员', 'admin')
+ON CONFLICT (username) DO NOTHING;
